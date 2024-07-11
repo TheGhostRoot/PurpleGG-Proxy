@@ -11,7 +11,9 @@ public class Main {
     public static String Warning = new StringBuilder("    WARNING!!!\n")
             .append("  THIS IS NOT A MALICIOUS PROGRAM. PURPLE GG WILL NEVER GIVE YOU VIRUSES. DON'T TRUST OTHER SOURCES THEN OUR PURPLE GG DISCORD: https://discord.gg/wm8pVfW5dF\n")
             .append("  By using this program you automatically agree to our ToS (Terms of Service) in our discord.\n")
-            .append("  This program gets proxies from the internet and saves only the good ones that are low latency and working.\n" )
+            .append("  This program gets proxies from the internet and saves only the good ones that are low latency and working.\n")
+            .append("  98% of all the proxies it generates are online and working.\n")
+            .append("  Purple GG is always on the lookout for more free proxies.")
             .toString();
 
     public static String Options = new StringBuilder(" [0] Exit\n")

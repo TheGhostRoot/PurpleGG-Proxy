@@ -1,7 +1,5 @@
 package me.purplegg.proxy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +12,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProxyHandler {
 
@@ -118,13 +120,24 @@ public class ProxyHandler {
         }
         try {
             allProxies.addAll(getGeoNodeProxies(protocol, amount));
-            allProxies.addAll(getProxyScrapeProxies(protocol, amount));
-            allProxies.addAll(getGimmeProxyProxies(protocol, amount));
+            for (PurpleProxy proxy : getProxyScrapeProxies(protocol, amount)) {
+                if (allProxies.stream().noneMatch(purpleProxy ->
+                        purpleProxy.ip.equals(proxy.ip) && purpleProxy.port == proxy.port)) {
+                    allProxies.add(proxy);
+                }
+            }
+
+            for (PurpleProxy proxy : getGimmeProxyProxies(protocol, amount)) {
+                if (allProxies.stream().noneMatch(purpleProxy ->
+                        purpleProxy.ip.equals(proxy.ip) && purpleProxy.port == proxy.port)) {
+                    allProxies.add(proxy);
+                }
+            }
+            ConsoleUtils.print("Total proxies from the web "+allProxies.size(), ConsoleColor.green);
             return allProxies;
         } catch (Exception ignore) {
             ConsoleUtils.print("Couldn't get proxies from the web", ConsoleColor.red);
         }
-
         return allProxies;
     }
 
@@ -133,7 +146,13 @@ public class ProxyHandler {
         List<PurpleProxy> allProxies = new ArrayList<>();
         if (protocol.equals(Proxy.Type.DIRECT)) {
             allProxies.addAll(readProxiesFromFile(httpPath, amount));
-            allProxies.addAll(readProxiesFromFile(socksPath, amount));
+
+            for (PurpleProxy proxy : readProxiesFromFile(socksPath, amount)) {
+                if (allProxies.stream().noneMatch(purpleProxy ->
+                        purpleProxy.ip.equals(proxy.ip) && purpleProxy.port == proxy.port)) {
+                    allProxies.add(proxy);
+                }
+            }
 
         } else if (protocol.equals(Proxy.Type.HTTP)) {
             allProxies.addAll(readProxiesFromFile(httpPath, amount));
@@ -141,6 +160,7 @@ public class ProxyHandler {
         } else {
             allProxies.addAll(readProxiesFromFile(socksPath, amount));
         }
+        ConsoleUtils.print("Total proxies from the file "+allProxies.size(), ConsoleColor.green);
         return allProxies;
     }
 
@@ -173,8 +193,12 @@ public class ProxyHandler {
                     ip = ipPart[1];
                 }
 
-                proxies.add(new PurpleProxy(ip, port, username, password,
-                        proxyParts[0].contains("socks") ? Proxy.Type.SOCKS : Proxy.Type.HTTP, -1));
+                String tempIp = new String(ip);
+                if (proxies.stream().noneMatch(purpleProxy ->
+                            purpleProxy.ip.equals(tempIp) && purpleProxy.port == port)) {
+                    proxies.add(new PurpleProxy(ip, port, username, password,
+                            proxyParts[0].contains("socks") ? Proxy.Type.SOCKS : Proxy.Type.HTTP, -1));
+                }
             }
             return proxies;
 
@@ -185,12 +209,37 @@ public class ProxyHandler {
 
     public static List<PurpleProxy> runCheckers(List<PurpleProxy> proxies, int threads) {
         List<PurpleProxy> validProxies = new ArrayList<>();
-        // TODO Run this in multithreading
-        for (PurpleProxy proxy : proxies) {
-            if (proxy.checkProxy()) {
-                validProxies.add(proxy);
+        try {
+            ExecutorService executor = Executors.newFixedThreadPool(threads);
+            AtomicInteger index = new AtomicInteger(-1);
+
+            Runnable task = () -> {
+                while (true) {
+                    int i = index.getAndIncrement();
+                    if (i >= proxies.size()) {
+                        break;
+                    }
+                    PurpleProxy proxy = proxies.get(i);
+                    if (proxy.checkProxy()) {
+                        synchronized (validProxies) {
+                            validProxies.add(proxy);
+                        }
+                    }
+                }
+            };
+
+            for (int i = 0; i < threads; i++) {
+                executor.submit(task);
             }
-        }
+
+            executor.shutdown();
+            try {
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        } catch (Exception ignore) {}
+        ConsoleUtils.print("Checked "+validProxies.size()+" proxies", ConsoleColor.green);
         return validProxies;
     }
 
@@ -201,6 +250,8 @@ public class ProxyHandler {
                 out.println(proxy.toString());
             }
             out.close();
+            ConsoleUtils.print("Saved "+proxies.size() + " proxies to "+outputPath, ConsoleColor.green);
+
         } catch (Exception e) {
             ConsoleUtils.print("Couldn't save the proxies to "+outputPath, ConsoleColor.red);
         }

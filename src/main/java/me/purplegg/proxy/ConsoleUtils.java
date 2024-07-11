@@ -78,7 +78,7 @@ public class ConsoleUtils {
     public static int getOption() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            ConsoleUtils.print("root/> ", ConsoleColor.white);
+            System.out.print("root/> ");
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
                 try {

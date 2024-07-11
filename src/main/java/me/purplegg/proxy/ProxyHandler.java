@@ -182,4 +182,9 @@ public class ProxyHandler {
         saveProxies(runCheckers(getProxiesFromInternet(proxyType, proxies), threads), outputPath);
     }
 
+    public static void runManualProxyGenerator(String httpFilePath, String socksFilePath, int threads, int proxies,
+                                               Proxy.Type proxyType, String outputPath) {
+        saveProxies(runCheckers(getProxiesFromFiles(proxyType, httpFilePath, socksFilePath, proxies), threads), outputPath);
+    }
+
 }

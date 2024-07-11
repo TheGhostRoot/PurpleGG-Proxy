@@ -1,2 +1,2 @@
-java -jar build/libs/License-0.1.jar
+java -jar build/libs/License-0.1-all.jar
 pause

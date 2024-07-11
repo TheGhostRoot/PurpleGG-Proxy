@@ -4,6 +4,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 
+import java.net.Proxy;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -77,7 +78,7 @@ public class ConsoleUtils {
     public static int getOption() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("root/> ");
+            ConsoleUtils.print("root/> ", ConsoleColor.white);
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
                 try {
@@ -100,31 +101,86 @@ public class ConsoleUtils {
                 color == ConsoleColor.white ? "\033[37m" : "\033[0m")+message+"\033[0m");
     }
 
-    public static void spoofOption(int option) throws Exception {
+    public static int getThreads() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            ConsoleUtils.print("How many threads? ", ConsoleColor.yellow);
+            String option = scanner.nextLine().trim();
+            if (!option.isEmpty()) {
+                try {
+                    return Math.abs(Integer.parseInt(option));
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+    }
+
+    public static int getAmount() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            ConsoleUtils.print("How many proxies? ", ConsoleColor.yellow);
+            String option = scanner.nextLine().trim();
+            if (!option.isEmpty()) {
+                try {
+                    return Math.abs(Integer.parseInt(option));
+                } catch (NumberFormatException ignored) {
+                    return -1;
+                }
+            }
+        }
+    }
+
+    public static String getOutputPath() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            ConsoleUtils.print("Enter the path of output file with the file extension like .txt ? ", ConsoleColor.yellow);
+            String option = scanner.nextLine().trim();
+            if (!option.isEmpty()) {
+                return option;
+            }
+        }
+    }
+
+    public static String getProxyPath() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            ConsoleUtils.print("Enter the path of input proxy file with the file extension like .txt ? ", ConsoleColor.yellow);
+            String option = scanner.nextLine().trim();
+            if (!option.isEmpty()) {
+                return option;
+            }
+        }
+    }
+
+    public static void spoofOption(int option) {
+        if (option == 0) {
+            System.exit(0);
+            return;
+        }
+        int threads = getThreads();
+        int amount = getAmount();
+        String outputFile = getOutputPath();
         switch (option) {
-            case 0:
-                System.exit(0);
-                break;
             case 1:
-                // TODO Automatic proxy generator for all protocols
+                ProxyHandler.runAutomaticProxyGenerator(threads, amount, Proxy.Type.HTTP, outputFile);
                 break;
             case 2:
-                // TODO Automatic HTTP/S proxy generator
+                ProxyHandler.runAutomaticProxyGenerator(threads, amount, Proxy.Type.SOCKS, outputFile);
                 break;
             case 3:
-                // TODO Automatic SOCK4/5 proxy generator
+                String httpFile = getProxyPath();
+                ProxyHandler.runManualProxyGenerator(httpFile, "", threads, amount, Proxy.Type.HTTP,
+                        outputFile);
                 break;
             case 4:
-                // TODO Manual HTTP/S proxy checker
+                String socksFile = getProxyPath();
+                ProxyHandler.runManualProxyGenerator(socksFile, "", threads, amount, Proxy.Type.SOCKS,
+                        outputFile);
                 break;
             case 5:
-                // TODO Manual SOCK4/5 proxy checker
+                ProxyHandler.saveProxies(ProxyHandler.getProxiesFromInternet(Proxy.Type.HTTP, amount), outputFile);
                 break;
             case 6:
-                // TODO Manual proxy checker for all protocols
-                break;
-            case 7:
-                // TODO Save unchecked web proxies
+                ProxyHandler.saveProxies(ProxyHandler.getProxiesFromInternet(Proxy.Type.SOCKS, amount), outputFile);
                 break;
             default:
                 printOptions();

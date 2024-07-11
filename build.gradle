@@ -8,6 +8,10 @@ plugins {
 group = 'me.purplegg.proxy'
 version = '0.1'
 
+shadowJar {
+    mainClassName = "me.purplegg.proxy.Main"
+}
+
 repositories {
     mavenCentral()
 }

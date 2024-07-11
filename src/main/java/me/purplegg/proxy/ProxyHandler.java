@@ -39,9 +39,7 @@ public class ProxyHandler {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             Map<String, Object> jsonMap = getRequestData(connection);
             connection.disconnect();
-            Object proxyList = jsonMap.get("data");
-            ConsoleUtils.print(proxyList.getClass().getSimpleName(), ConsoleColor.green);
-            for (Map<String, Object> webProxy : (List<Map<String, Object>>) proxyList) {
+            for (Map<String, Object> webProxy : (List<Map<String, Object>>) jsonMap.get("data")) {
                 List<String> protos = ((List<String>) webProxy.get("protocols"));
                 int port = Integer.parseInt(String.valueOf(webProxy.get("port")));
                 if ((protos.contains("socks4") || protos.contains("socks5")) && protocol.equals(Proxy.Type.SOCKS)) {
@@ -56,6 +54,7 @@ public class ProxyHandler {
 
             }
         }
+        connection.disconnect();
         ConsoleUtils.print("Got "+allProxies.size()+" proxies from geonode.com", ConsoleColor.green);
         return allProxies;
     }
@@ -69,9 +68,7 @@ public class ProxyHandler {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             Map<String, Object> jsonMap = getRequestData(connection);
             connection.disconnect();
-            Object proxyList = jsonMap.get("proxies");
-            ConsoleUtils.print(proxyList.getClass().getSimpleName(), ConsoleColor.green);
-            for (Map<String, Object> webProxy : (List<Map<String, Object>>) proxyList) {
+            for (Map<String, Object> webProxy : (List<Map<String, Object>>) jsonMap.get("proxies")) {
                 String protos = String.valueOf(webProxy.get("protocol"));
                 int port = Integer.parseInt(String.valueOf(webProxy.get("port")));
                 if (protos.contains("socks") && protocol.equals(Proxy.Type.SOCKS)) {
@@ -86,15 +83,43 @@ public class ProxyHandler {
 
             }
         }
+        connection.disconnect();
         ConsoleUtils.print("Got "+allProxies.size()+" proxies from proxyscrape.com", ConsoleColor.green);
+        return allProxies;
+    }
+
+    public static List<PurpleProxy> getGimmeProxyProxies(Proxy.Type protocol, int amount) throws Exception {
+        List<PurpleProxy> allProxies = new ArrayList<>();
+        for (int i = 0; i < amount; i++) {
+            HttpURLConnection connection = (HttpURLConnection)
+                    URI.create("https://gimmeproxy.com/api/getProxy").toURL().openConnection();
+            connection.setRequestMethod("GET");
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                Map<String, Object> jsonMap = getRequestData(connection);
+                connection.disconnect();
+                String proto = String.valueOf(jsonMap.get("protocol"));
+                if ((proto.contains("socks") && protocol.equals(Proxy.Type.SOCKS)) ||
+                        (proto.contains("http") && protocol.equals(Proxy.Type.HTTP))) {
+                    allProxies.add(new PurpleProxy(String.valueOf(jsonMap.get("ip")),
+                            Integer.parseInt(String.valueOf(jsonMap.get("port"))), "", "",
+                            protocol, -1));
+                }
+            }
+            connection.disconnect();
+        }
+        ConsoleUtils.print("Got "+allProxies.size()+" proxies from gimmeproxy.com", ConsoleColor.green);
         return allProxies;
     }
 
     public static List<PurpleProxy> getProxiesFromInternet(Proxy.Type protocol, int amount) {
         List<PurpleProxy> allProxies = new ArrayList<>();
+        if (amount < 0) {
+            amount = 100;
+        }
         try {
             allProxies.addAll(getGeoNodeProxies(protocol, amount));
             allProxies.addAll(getProxyScrapeProxies(protocol, amount));
+            allProxies.addAll(getGimmeProxyProxies(protocol, amount));
             return allProxies;
         } catch (Exception ignore) {
             ConsoleUtils.print("Couldn't get proxies from the web", ConsoleColor.red);
@@ -121,10 +146,13 @@ public class ProxyHandler {
 
     public static List<PurpleProxy> readProxiesFromFile(String path, int amount) {
         List<PurpleProxy> proxies = new ArrayList<>();
+        if (path.length() == 0) {
+            return proxies;
+        }
         try {
             int currentLine = 0;
             for (String line : Files.readAllLines(Paths.get(path))) {
-                if (currentLine >= amount) {
+                if (currentLine >= amount && amount > -1) {
                     break;
                 }
                 currentLine++;
@@ -168,7 +196,7 @@ public class ProxyHandler {
 
     public static void saveProxies(List<PurpleProxy> proxies, String outputPath) {
         try {
-            PrintWriter out = new PrintWriter("filename.txt");
+            PrintWriter out = new PrintWriter(outputPath);
             for (PurpleProxy proxy : proxies) {
                 out.println(proxy.toString());
             }
@@ -188,3 +216,4 @@ public class ProxyHandler {
     }
 
 }
+

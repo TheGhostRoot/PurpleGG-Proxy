@@ -14,10 +14,10 @@ public class Main {
             .append("  This program gets proxies from the internet and saves only the good ones that are low latency and working.\n" )
             .toString();
 
-    public static String Options = new StringBuilder(" [1] Automatic proxy generator for both protocols\n")
-            .append(" [2] Automatic HTTP/S proxy generator\n").append(" [3] Automatic SOCKS4/5 proxy generator\n\n")
-            .append(" [4] Manual HTTP/S proxy checker\n").append(" [5] Manual SOCKS4/5 proxy checker\n")
-            .append(" [6] Manual proxy checker for both protocols\n").append(" [7] Save unchecked web proxies\n")
+    public static String Options = new StringBuilder(" [0] Exit\n")
+            .append(" [1] Automatic HTTP/S proxy generator\n").append(" [2] Automatic SOCKS4/5 proxy generator\n\n")
+            .append(" [3] Manual HTTP/S proxy checker\n").append(" [4] Manual SOCKS4/5 proxy checker\n")
+            .append(" [5] Save unchecked HTTP/S web proxies\n").append(" [6] Save unchecked SOCKS4/5 web proxies\n")
             .toString();
 
     public static String AsciiArtLogo = new StringBuilder( "\n     ███████████                                 ████                █████████    █████████   \n")

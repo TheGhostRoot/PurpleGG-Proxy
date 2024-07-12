@@ -111,28 +111,6 @@ public class ProxyHandler {
         return allProxies;
     }
 
-    public static List<PurpleProxy> getGimmeProxyProxies(Proxy.Type protocol, int amount) throws Exception {
-        List<PurpleProxy> allProxies = new ArrayList<>();
-        for (int i = 0; i < amount; i++) {
-            HttpURLConnection connection = (HttpURLConnection)
-                    URI.create("https://gimmeproxy.com/api/getProxy").toURL().openConnection();
-            connection.setRequestMethod("GET");
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                Map<String, Object> jsonMap = getRequestMapData(connection);
-                String proto = String.valueOf(jsonMap.get("protocol"));
-                if ((proto.contains("socks") && protocol.equals(Proxy.Type.SOCKS)) ||
-                        (proto.contains("http") && protocol.equals(Proxy.Type.HTTP))) {
-                    allProxies.add(new PurpleProxy(String.valueOf(jsonMap.get("ip")),
-                            Integer.parseInt(String.valueOf(jsonMap.get("port"))), "", "",
-                            protocol, -1));
-                }
-            }
-            connection.disconnect();
-        }
-        ConsoleUtils.print("Got "+allProxies.size()+" proxies from gimmeproxy.com", ConsoleColor.green);
-        return allProxies;
-    }
-
     public static List<PurpleProxy> getGithubTheSpeedXProxies(Proxy.Type protocol, int amount) throws Exception {
         List<PurpleProxy> allProxies = new ArrayList<>();
         List<URL> urls = new ArrayList<>();
@@ -311,7 +289,6 @@ public class ProxyHandler {
         try {
             allProxies.addAll(getGeoNodeProxies(protocol, amount));
             allProxies.addAll(removeDuplication(allProxies, getProxyScrapeProxies(protocol, amount)));
-            allProxies.addAll(removeDuplication(allProxies, getGimmeProxyProxies(protocol, amount)));
             allProxies.addAll(removeDuplication(allProxies, getGithubTheSpeedXProxies(protocol, amount)));
             allProxies.addAll(removeDuplication(allProxies, getOpenProxyProxies(protocol, amount)));
             allProxies.addAll(removeDuplication(allProxies, getVPNFallProxies(protocol, amount)));

@@ -84,6 +84,7 @@ public class ConsoleUtils {
                 try {
                     return Math.abs(Integer.parseInt(option));
                 } catch (NumberFormatException ignored) {
+                    printOptions();
                 }
             }
         }
@@ -181,6 +182,12 @@ public class ConsoleUtils {
                 break;
             case 6:
                 ProxyHandler.saveProxies(ProxyHandler.getProxiesFromInternet(Proxy.Type.SOCKS, amount), outputFile);
+                break;
+            case 7:
+                ProxyHandler.runScanWholeInternet(Proxy.Type.HTTP, threads, amount, outputFile);
+                break;
+            case 8:
+                ProxyHandler.runScanWholeInternet(Proxy.Type.SOCKS, threads, amount, outputFile);
                 break;
             default:
                 printOptions();

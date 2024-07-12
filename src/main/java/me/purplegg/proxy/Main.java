@@ -19,7 +19,9 @@ public class Main {
     public static String Options = new StringBuilder(" [0] Exit\n")
             .append(" [1] Automatic HTTP/S proxy generator\n").append(" [2] Automatic SOCKS4/5 proxy generator\n\n")
             .append(" [3] Manual HTTP/S proxy checker\n").append(" [4] Manual SOCKS4/5 proxy checker\n")
-            .append(" [5] Save unchecked HTTP/S web proxies\n").append(" [6] Save unchecked SOCKS4/5 web proxies\n")
+            .append(" [5] Save unchecked HTTP/S web proxies\n").append(" [6] Save unchecked SOCKS4/5 web proxies\n\n")
+            .append(" [7] Scan the whole internet IP by IP for HTTP/S proxies\n")
+            .append(" [8] Scan the whole internet IP by IP for SOCKS4/5 proxies\n")
             .toString();
 
     public static String AsciiArtLogo = new StringBuilder( "\n     ███████████                                 ████                █████████    █████████   \n")

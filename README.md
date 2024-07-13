@@ -14,5 +14,6 @@ http://username:password@ip:port
 socks4://ip:port
 socks5://username:password@ip:port
 ```
-
+### Note
+`usernames` and `passwords` shouldn't contain `:` or `@`
 

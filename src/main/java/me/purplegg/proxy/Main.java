@@ -152,7 +152,7 @@ public class Main {
 
     public static void main(String[] args) {
         Logger.getLogger("").getHandlers()[0].setFormatter(new LoggerFormatter());
-        ConsoleUtils.setTitle("Purple GG | Woofer");
+        ConsoleUtils.setTitle("Purple GG | Proxy");
         ConsoleUtils.clearConsole();
         ConsoleUtils.validateLicense();
         ConsoleUtils.printWarning();

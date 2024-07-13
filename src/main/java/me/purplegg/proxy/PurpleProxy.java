@@ -1,11 +1,8 @@
 package me.purplegg.proxy;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
+import java.net.*;
 import java.net.Proxy.Type;
-import java.net.URI;
 import java.util.Base64;
 
 public class PurpleProxy {
@@ -29,12 +26,16 @@ public class PurpleProxy {
         Proxy proxy = new Proxy(protocol, new InetSocketAddress(ip, port));
         try {
             long startTime = System.currentTimeMillis();
+            if (isAuth()) {
+                Authenticator.setDefault(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password.toCharArray());
+                    }
+                });
+            }
             HttpURLConnection connection = (HttpURLConnection) URI.create("http://httpbin.org/ip").toURL().openConnection(proxy);
             connection.setRequestMethod("GET");
-            if (isAuth()) {
-                connection.setRequestProperty("Proxy-Authorization", "Basic " +
-                        new String(Base64.getEncoder().encode((username + ":" + password).getBytes())));
-            }
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setInstanceFollowRedirects(true);
@@ -43,8 +44,8 @@ public class PurpleProxy {
             this.latency = endTime - startTime;
 
             connection.disconnect();
+            Authenticator.setDefault(null);
             return true;
-
         } catch (IOException e) {
             return false;
         }

@@ -409,7 +409,7 @@ public class ProxyHandler {
     public static List<PurpleProxy> runCheckers(List<PurpleProxy> proxies, int threads) {
         List<PurpleProxy> validProxies = new ArrayList<>();
         try {
-            ExecutorService executor = Executors.newFixedThreadPool(threads);
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(proxies.size(), threads));
             AtomicInteger index = new AtomicInteger(-1);
 
             Runnable task = () -> {

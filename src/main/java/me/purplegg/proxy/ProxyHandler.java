@@ -382,7 +382,12 @@ public class ProxyHandler {
                 //  http //username password@IP PORT
                 String[] proxyParts = line.split(":");
                 proxyParts[1] = proxyParts[1].replace("//", "");
-                int port = Integer.parseInt(proxyParts[proxyParts.length - 1]);
+                int port;
+                try {
+                    port = Integer.parseInt(proxyParts[proxyParts.length - 1]);
+                } catch (Exception e) {
+                    continue;
+                }
                 String ip = proxyParts[proxyParts.length - 2];
                 String username = proxyParts[1];
                 String password = "";

@@ -118,7 +118,7 @@ public class ConsoleUtils {
     public static int getAmount() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            ConsoleUtils.print("How many proxies? ", ConsoleColor.yellow);
+            ConsoleUtils.print("How many proxies to be generated? ", ConsoleColor.yellow);
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
                 try {

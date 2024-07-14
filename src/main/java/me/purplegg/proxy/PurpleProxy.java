@@ -39,13 +39,14 @@ public class PurpleProxy {
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setInstanceFollowRedirects(true);
-            connection.connect();
             long endTime = System.currentTimeMillis();
             this.latency = endTime - startTime;
-
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                return true;
+            }
             connection.disconnect();
             Authenticator.setDefault(null);
-            return true;
+            throw new Exception();
         } catch (Exception e) {
             return false;
         }

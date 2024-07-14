@@ -46,7 +46,7 @@ public class PurpleProxy {
             connection.disconnect();
             Authenticator.setDefault(null);
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             return false;
         }
     }

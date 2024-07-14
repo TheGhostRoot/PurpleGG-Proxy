@@ -152,6 +152,7 @@ public class Main {
         ConsoleUtils.showLoading();
         ConsoleUtils.printLogo();
         ConsoleUtils.printOptions();
+        ProxyHandler.disableSSLVerification();
         while (true) {
             try {
                 ConsoleUtils.spoofOption(ConsoleUtils.getOption());

@@ -4,6 +4,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 
+import java.awt.*;
 import java.net.Proxy;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,16 @@ public class ConsoleUtils {
     }
 
     public static void setTitle(String title) {
-        CLibrary.INSTANCE.SetConsoleTitleA(title);
+        if (GraphicsEnvironment.isHeadless()) {
+            // No GUI available, do nothing
+            return;
+        }
+        if (Platform.isWindows()) {
+            CLibrary.INSTANCE.SetConsoleTitleA(title);
+        } else {
+            // For Linux and macOS
+            System.out.print("\033]0;" + title + "\007");
+        }
     }
 
     public static void printWarning() {

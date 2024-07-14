@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 set "file=./src/main/java/me/purplegg/proxy/ConsoleUtils.java"
-set "line_number=201"
+set "line_number=211"
 call :GenerateRandomString random_string
 set "new_content=        String LicenseKey = \"!random_string!\";"
 rem Use PowerShell to edit the file directly

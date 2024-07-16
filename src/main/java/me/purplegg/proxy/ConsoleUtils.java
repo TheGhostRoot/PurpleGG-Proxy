@@ -92,7 +92,6 @@ public class ConsoleUtils {
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
                 try {
-                    scanner.close();
                     return Math.abs(Integer.parseInt(option));
                 } catch (NumberFormatException ignored) {
                     printOptions();
@@ -120,7 +119,6 @@ public class ConsoleUtils {
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
                 try {
-                    scanner.close();
                     return Math.abs(Integer.parseInt(option));
                 } catch (NumberFormatException ignored) {}
             }
@@ -134,7 +132,6 @@ public class ConsoleUtils {
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
                 try {
-                    scanner.close();
                     return Math.abs(Integer.parseInt(option));
                 } catch (NumberFormatException ignored) {
                     return -1;
@@ -149,7 +146,6 @@ public class ConsoleUtils {
             ConsoleUtils.print("Enter the path of output file with the file extension like .txt ? ", ConsoleColor.yellow);
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
-                scanner.close();
                 return option;
             }
         }
@@ -161,7 +157,6 @@ public class ConsoleUtils {
             ConsoleUtils.print("Enter the path of input proxy file with the file extension like .txt ? ", ConsoleColor.yellow);
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
-                scanner.close();
                 return option;
             }
         }
@@ -173,7 +168,6 @@ public class ConsoleUtils {
             ConsoleUtils.print("Enter the full url to host (default: http://httpbin.org/ip)", ConsoleColor.yellow);
             String option = scanner.nextLine().trim();
             if (!option.isEmpty()) {
-                scanner.close();
                 return option;
             }
         }
@@ -182,6 +176,10 @@ public class ConsoleUtils {
     public static void spoofOption(int option) {
         if (option == 0) {
             System.exit(0);
+            return;
+        }
+        if (option == 9) {
+            Main.host = getHost();
             return;
         }
         int threads = getThreads();
@@ -215,9 +213,6 @@ public class ConsoleUtils {
                 break;
             case 8:
                 ProxyHandler.runScanWholeInternet(Proxy.Type.SOCKS, threads, amount, outputFile);
-                break;
-            case 9:
-                Main.host = getHost();
                 break;
             default:
                 printOptions();

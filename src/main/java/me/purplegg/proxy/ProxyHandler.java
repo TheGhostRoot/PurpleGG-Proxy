@@ -15,10 +15,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProxyHandler {
 
@@ -339,6 +335,9 @@ public class ProxyHandler {
                                                          List<PurpleProxy> allProxies) throws Exception {
         for (String line : getRequestTextData(connection)) {
             String[] addressIp = line.split(":");
+            if (addressIp.length > 2) {
+                continue;
+            }
             if (allProxies.size() >= amount) {
                 break;
             }
@@ -415,39 +414,23 @@ public class ProxyHandler {
 
     public static List<PurpleProxy> runCheckers(List<PurpleProxy> proxies, int threads) {
         List<PurpleProxy> validProxies = new ArrayList<>();
-        try {
-            ExecutorService executor = Executors.newFixedThreadPool(Math.min(proxies.size(), threads));
-            AtomicInteger index = new AtomicInteger(-1);
-
-            Runnable task = () -> {
-                while (true) {
-                    int i = index.getAndIncrement();
-                    if (i >= proxies.size()) {
-                        break;
-                    }
-                    PurpleProxy proxy = proxies.get(i);
-                    if (proxy.checkProxy()) {
-                        synchronized (validProxies) {
-                            ConsoleUtils.print("Online - " +proxy.protocol.name().toUpperCase() +
-                                    " - "+ proxy.ip + ":"+proxy.port, ConsoleColor.green);
-                            validProxies.add(proxy);
-                        }
+        long start = System.currentTimeMillis();
+        ManageTasks manageTasks = new ManageTasks(Math.min(proxies.size(), threads));
+        for (PurpleProxy proxy : proxies) {
+            manageTasks.submitTask(n -> {
+                if (proxy.checkProxy()) {
+                    synchronized (validProxies) {
+                        validProxies.add(proxy);
+                        ConsoleUtils.print("Online - " +proxy.protocol.name().toUpperCase() +
+                                " - "+ proxy.ip + ":"+proxy.port, ConsoleColor.green);
                     }
                 }
-            };
-
-            for (int i = 0; i < threads; i++) {
-                executor.submit(task);
-            }
-
-            executor.shutdown();
-            try {
-                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        } catch (Exception ignore) {}
-        ConsoleUtils.print("Checked "+validProxies.size()+" proxies", ConsoleColor.green);
+            });
+        }
+        manageTasks.shutdown();
+        long end = System.currentTimeMillis();
+        ConsoleUtils.print("Online "+validProxies.size()+" proxies. Elapsed Time in seconds seconds: "+
+                (double) ((end-start) / 1000), ConsoleColor.green);
         return validProxies;
     }
 

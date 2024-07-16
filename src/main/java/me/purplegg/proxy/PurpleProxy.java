@@ -34,8 +34,8 @@ public class PurpleProxy {
             }
             HttpURLConnection connection = (HttpURLConnection) URI.create(Main.host).toURL().openConnection(proxy);
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(1500);
+            connection.setReadTimeout(1500);
             connection.setInstanceFollowRedirects(true);
             long endTime = System.currentTimeMillis();
             this.latency = endTime - startTime;

@@ -413,6 +413,7 @@ public class ProxyHandler {
     }
 
     public static List<PurpleProxy> runCheckers(List<PurpleProxy> proxies, int threads) {
+        ConsoleUtils.print("Checking "+proxies.size()+" proxies...", ConsoleColor.green);
         List<PurpleProxy> validProxies = new ArrayList<>();
         long start = System.currentTimeMillis();
         ManageTasks manageTasks = new ManageTasks(Math.min(proxies.size(), threads));
@@ -462,15 +463,20 @@ public class ProxyHandler {
     public static void runScanWholeInternet(Proxy.Type proxyType, int threads, int proxies, String outputPath) {
         List<PurpleProxy> ips = new ArrayList<>();
         List<PurpleProxy> valid = new ArrayList<>();
-        int port = 80;
+        PurpleProxy lastProxy = null;
+        int num = Math.min(proxies, 100);
+        // 49151
         while (valid.size() < proxies) {
-            while (ips.size() <= Math.min(proxies, 100)) {
-                String ip = generateNextPublicIPv4();
-                ips.add(new PurpleProxy(ip, port, "", "", proxyType, -1));
-                port++;
-                if (port >= 49152) {
-                    port = 80;
+            while (ips.size() < num) {
+                if (lastProxy != null && lastProxy.port < 49151) {
+                    lastProxy.port += 1;
+                    ips.add(new PurpleProxy(lastProxy.ip, lastProxy.port, "", "", proxyType, -1));
+                    continue;
                 }
+                // 80
+                lastProxy = new PurpleProxy(generateNextPublicIPv4(), 80, "", "", proxyType, -1);
+                ips.add(lastProxy);
+
             }
             valid.addAll(runCheckers(ips, threads));
             ips.clear();

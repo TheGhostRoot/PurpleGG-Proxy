@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 public class Main {
     public static Logger logger = Logger.getGlobal();
     public static ObjectMapper mapper = new ObjectMapper();
+    public static String host = "http://httpbin.org/ip";
 
     public static String Warning = new StringBuilder("    WARNING!!!\n")
             .append("  THIS IS NOT A MALICIOUS PROGRAM. PURPLE GG WILL NEVER GIVE YOU VIRUSES. DON'T TRUST OTHER SOURCES THEN OUR PURPLE GG DISCORD: https://discord.gg/wm8pVfW5dF\n")
@@ -18,10 +19,10 @@ public class Main {
 
     public static String Options = new StringBuilder(" [0] Exit\n")
             .append(" [1] Automatic HTTP/S proxy generator\n").append(" [2] Automatic SOCKS4/5 proxy generator\n\n")
-            .append(" [3] Manual HTTP/S proxy checker\n").append(" [4] Manual SOCKS4/5 proxy checker\n")
+            .append(" [3] Manual HTTP/S proxy checker\n").append(" [4] Manual SOCKS4/5 proxy checker\n\n")
             .append(" [5] Save unchecked HTTP/S web proxies\n").append(" [6] Save unchecked SOCKS4/5 web proxies\n\n")
             .append(" [7] Scan the whole internet IP by IP for HTTP/S proxies\n")
-            .append(" [8] Scan the whole internet IP by IP for SOCKS4/5 proxies\n")
+            .append(" [8] Scan the whole internet IP by IP for SOCKS4/5 proxies\n\n").append(" [9] Change proxy check host\n")
             .toString();
 
     public static String AsciiArtLogo = new StringBuilder( "\n    ██████╗ ██╗   ██╗██████╗ ██████╗ ██╗     ███████╗     ██████╗  ██████╗     \n")

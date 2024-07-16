@@ -1,9 +1,7 @@
 package me.purplegg.proxy;
 
-import java.io.IOException;
 import java.net.*;
 import java.net.Proxy.Type;
-import java.util.Base64;
 
 public class PurpleProxy {
     public int port;
@@ -34,7 +32,7 @@ public class PurpleProxy {
                     }
                 });
             }
-            HttpURLConnection connection = (HttpURLConnection) URI.create("http://httpbin.org/ip").toURL().openConnection(proxy);
+            HttpURLConnection connection = (HttpURLConnection) URI.create(Main.host).toURL().openConnection(proxy);
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);

@@ -478,19 +478,21 @@ public class ProxyHandler {
 
     public static void runScanWholeInternet(Proxy.Type proxyType, int threads, int proxies, String outputPath) {
         List<PurpleProxy> ips = new ArrayList<>();
-        List<String> addresses = new ArrayList<>();
-        String ip = generateNextPublicIPv4();
-        while (ip != null) {
-            addresses.add(ip);
-            for (int port = 80; port <= 49151; port++) {
+        List<PurpleProxy> valid = new ArrayList<>();
+        int port = 80;
+        while (valid.size() < proxies) {
+            while (ips.size() <= Math.min(proxies, 100)) {
+                String ip = generateNextPublicIPv4();
                 ips.add(new PurpleProxy(ip, port, "", "", proxyType, -1));
+                port++;
+                if (port >= 49152) {
+                    port = 80;
+                }
             }
-            if (addresses.size() >= proxies) {
-                break;
-            }
-            ip = generateNextPublicIPv4();
+            valid.addAll(runCheckers(ips, threads));
+            ips.clear();
         }
-        saveProxies(runCheckers(ips, threads), outputPath);
+        saveProxies(valid, outputPath);
     }
 
 

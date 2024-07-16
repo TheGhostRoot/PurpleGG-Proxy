@@ -1,10 +1,7 @@
 package me.purplegg.proxy;
 
 import javax.net.ssl.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URI;
@@ -437,7 +434,7 @@ public class ProxyHandler {
 
     public static void saveProxies(List<PurpleProxy> proxies, String outputPath) {
         try {
-            PrintWriter out = new PrintWriter(outputPath);
+            PrintWriter out = new PrintWriter(new FileWriter(outputPath, true));
             for (PurpleProxy proxy : proxies) {
                 out.println(proxy.toString());
             }

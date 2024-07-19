@@ -425,7 +425,7 @@ public class ProxyHandler {
                 }
             });
         }
-        while (!manageTasks.checkAllTasksDone()) {}
+        while (!manageTasks.checkPrivateAllTasksDone()) {}
         manageTasks.shutdown();
         long end = System.currentTimeMillis();
         ConsoleUtils.print("Online "+validProxies.size()+" proxies. Elapsed Time in seconds seconds: "+

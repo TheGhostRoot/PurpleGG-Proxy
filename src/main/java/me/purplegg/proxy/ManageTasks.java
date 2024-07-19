@@ -14,6 +14,20 @@ public class ManageTasks {
 
     public ManageTasks(int threads) {
         this.executor = Executors.newFixedThreadPool(threads);
+        executor.submit(this::checker);
+    }
+
+    private void checker() {
+        List<Future<?>> toRemove = new ArrayList<>();
+        while (!executor.isShutdown()) {
+            for (Future<?> task : futures) {
+                if (task.isDone() || task.isCancelled()) {
+                    toRemove.add(task);
+                }
+            }
+            futures.removeAll(toRemove);
+            toRemove.clear();
+        }
     }
 
     public void submitTask(Consumer<?> task) {
@@ -21,16 +35,18 @@ public class ManageTasks {
         taskQueue.offer(task);
     }
 
-    public boolean checkAllTasksDone() {
-        boolean allDone = true;
-        for(Future<?> future : futures){
-            allDone &= future.isDone(); // check if future is done
+    public boolean checkPrivateAllTasksDone() {
+        for (Future<?> future : futures) {
+            if (!future.isDone()) {
+                return false;
+            }
         }
-        return allDone;
+        return true;
     }
 
     public void shutdown() {
         try {
+            futures.clear();
             executor.shutdown();
             executor.shutdownNow();
         } catch (Exception e) {

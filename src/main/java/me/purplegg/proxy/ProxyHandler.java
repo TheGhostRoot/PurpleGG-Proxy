@@ -425,6 +425,7 @@ public class ProxyHandler {
                 }
             });
         }
+        while (!manageTasks.checkAllTasksDone()) {}
         manageTasks.shutdown();
         long end = System.currentTimeMillis();
         ConsoleUtils.print("Online "+validProxies.size()+" proxies. Elapsed Time in seconds seconds: "+
@@ -432,7 +433,7 @@ public class ProxyHandler {
         return validProxies;
     }
 
-    public static void saveProxies(List<PurpleProxy> proxies, String outputPath) {
+    synchronized public static void saveProxies(List<PurpleProxy> proxies, String outputPath) {
         try {
             PrintWriter out = new PrintWriter(new FileWriter(outputPath, true));
             for (PurpleProxy proxy : proxies) {

@@ -4,26 +4,29 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class ManageTasks {
     private final ExecutorService executor;
     private final Queue<Consumer<?>> taskQueue = new ConcurrentLinkedQueue<>();
-    private int max_threads = 1;
-    private int current_threads = 0;
+    private List<Future<?>> futures = new ArrayList<>();
 
     public ManageTasks(int threads) {
-        this.max_threads = threads;
         this.executor = Executors.newFixedThreadPool(threads);
     }
 
     public void submitTask(Consumer<?> task) {
-        if (current_threads < max_threads) {
-            executor.submit(this::processTasks);
-            current_threads++;
-        }
+        futures.add(executor.submit(this::processTasks));
         taskQueue.offer(task);
+    }
+
+    public boolean checkAllTasksDone() {
+        boolean allDone = true;
+        for(Future<?> future : futures){
+            allDone &= future.isDone(); // check if future is done
+        }
+        return allDone;
     }
 
     public void shutdown() {
@@ -36,9 +39,15 @@ public class ManageTasks {
     }
 
     private void processTasks() {
+        if (taskQueue.isEmpty()) {
+            return;
+        }
         Consumer<?> task = taskQueue.remove();
         while (task != null) {
             task.accept(null);
+            if (taskQueue.isEmpty()) {
+                break;
+            }
             task = taskQueue.remove();
         }
     }

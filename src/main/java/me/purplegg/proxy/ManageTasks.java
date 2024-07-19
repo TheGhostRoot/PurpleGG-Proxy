@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 public class ManageTasks {
     private final ExecutorService executor;
     private final Queue<Consumer<?>> taskQueue = new ConcurrentLinkedQueue<>();
-    private boolean isRunning = true;
     private int max_threads = 1;
     private int current_threads = 0;
 
@@ -28,7 +27,6 @@ public class ManageTasks {
     }
 
     public void shutdown() {
-        isRunning = false;
         executor.shutdown();
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -38,13 +36,10 @@ public class ManageTasks {
     }
 
     private void processTasks() {
-        while (isRunning) {
-            Consumer<?> task = taskQueue.poll();
-            if (task == null) {
-                Thread.interrupted();
-                break;
-            }
+        Consumer<?> task = taskQueue.remove();
+        while (task != null) {
             task.accept(null);
+            task = taskQueue.remove();
         }
     }
 }

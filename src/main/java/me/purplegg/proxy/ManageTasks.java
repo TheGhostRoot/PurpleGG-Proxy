@@ -27,9 +27,9 @@ public class ManageTasks {
     }
 
     public void shutdown() {
-        executor.shutdown();
         try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            executor.shutdown();
+            executor.shutdownNow();
         } catch (Exception e) {
             Thread.currentThread().interrupt();
         }

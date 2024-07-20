@@ -53,6 +53,6 @@ public class PurpleProxy {
 
     @Override
     public String toString() {
-        return protocol.name().toLowerCase() + "://" + (isAuth() ? username + ":" + password + "@" : "") + ip +":"+port;
+        return (isAuth() ? username + ":" + password + "@" : "") + ip +":"+port;
     }
 }

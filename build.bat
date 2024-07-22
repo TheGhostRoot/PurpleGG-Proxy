@@ -1,2 +1,2 @@
-gradle clean build shadowJar
+gradle clean shadowJar
 pause

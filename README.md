@@ -1,5 +1,5 @@
 ### Purple GG's Proxy
-- This program verifies if a proxy is a valid proxy and how slow it is.
+- This program verifies if a proxy is a valid proxy.
 - It uses multithreading to work as fast as it can.
 - Has an option to get proxies from the web or from a file.
 - Then checks if the proxy is working and how slow it is.
